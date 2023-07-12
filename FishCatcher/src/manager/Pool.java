@@ -23,7 +23,7 @@ public class Pool extends JPanel {
 
     Fish[] allFish = new Fish[29];
 
-    Net net = new Net();
+    public Net net = new Net();
     Pt pt=new Pt();
 
     int score;
@@ -35,12 +35,12 @@ public class Pool extends JPanel {
     int mouseY = 0;
     int ptX = 405;
     int ptY = 400;
-    public int finX;
     public int finY;
     double angle;
     public JButton leftButton;
     public JButton rightButton;
-
+    public int level=1;//炮台和渔网共用等级(暂时没有实现，在点击切换炮台的两个按钮的时候渔网大小不会变化)
+    Graphics tmp;
     ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 
     public Pool(){
@@ -95,7 +95,7 @@ public class Pool extends JPanel {
 
     @Override
     public void paint(Graphics g) {
-
+        tmp=g;
         g.drawImage(poolImg, 0, 0, null);
         drawAllFish(g);
         drawNet(g);
@@ -121,6 +121,11 @@ public class Pool extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
+//                level++;
+//                if(level>5){
+//                    level=1;
+//                }
+//                net.level=level;
                 pt.addPt();
             }
         });
@@ -128,6 +133,11 @@ public class Pool extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
+//                level--;
+//                if(level<1){
+//                    level=5;
+//                }
+//                net.level=level;
                 pt.subPt();
             }
         });
@@ -245,12 +255,10 @@ public class Pool extends JPanel {
                 bullet.route = angle;
 
                 bullet.p = new Point(ptX +19,ptY +39);
-                if(bullets.size()<5){
+                if (e.getButton() == MouseEvent.BUTTON1&&bullets.size()<5) {
                     bullets.add(bullet);
                     BulletThread thread = new BulletThread(bullet);
                     thread.start();
-                }
-                if (e.getButton() == MouseEvent.BUTTON1&&bullets.size()<5) {
                     catchFish(netPoint);
                 } else if (e.getButton() == MouseEvent.BUTTON3) {
 //                    System.out.println("鼠标右键点击");
@@ -280,8 +288,22 @@ public class Pool extends JPanel {
                     public void run() {
                         fish.removing();
                         if (fish.fishImg.getWidth() < 200) {//捕捉鱼的得分
+//                            File file = new File("source/image/score/score_10.png");
+//                            try {
+//                                BufferedImage img=ImageIO.read(file);
+//                                tmp.drawImage(img,400,50,null);
+//                            } catch (IOException e) {
+//                                throw new RuntimeException(e);
+//                            }
                             score += 10;
                         } else {
+//                            File file = new File("source/image/score/score_20.png");
+//                            try {
+//                                BufferedImage img=ImageIO.read(file);
+//                                tmp.drawImage(img,400,50,null);
+//                            } catch (IOException e) {
+//                                throw new RuntimeException(e);
+//                            }
                             score += 20;
                         }
                         if(score>1000){
@@ -336,6 +358,5 @@ public class Pool extends JPanel {
             allFish[i].start();
         }
     }
-
 
 }

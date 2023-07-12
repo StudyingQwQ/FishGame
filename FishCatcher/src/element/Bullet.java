@@ -14,23 +14,21 @@ public class Bullet {
     Pool panel;
     public boolean isLive = true;
     private int[] speed = {5, 10, 15, 20, 25};
-    Net net=new Net();
-    Pool pool=new Pool();
+
     public Bullet(Pool pool){
         this.panel = pool;
     }
     public void moving(){
         if(isLive){
-            y -= 15;//子弹移动速度(本来想做成根据炮台等级改变速度的，试了几次搞不定，之后再说吧）
+            y -= speed[(panel.net.level-1)%5];//子弹移动速度
             panel.repaint();
-            if(y<=-100){
+            if(y<=panel.finY){//子弹消失位置
                 isLive = false;
             }
         }
     }
     public void drawBullet(Graphics g){
-//        System.out.println("test");
-//        System.out.printf(pool.finY +"\n");
+//        System.out.printf(panel.finY +"\n");
         Graphics2D gp = (Graphics2D)g.create();
         gp.rotate(route,p.x,p.y);
         gp.drawImage(imageIcon.getImage(),x,y,panel);
