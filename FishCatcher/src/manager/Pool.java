@@ -4,12 +4,11 @@ import controller.BulletThread;
 import element.Bullet;
 import element.Fish;
 import element.Net;
+import element.Pt;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -25,6 +24,7 @@ public class Pool extends JPanel {
     Fish[] allFish = new Fish[29];
 
     Net net = new Net();
+    Pt pt=new Pt();
 
     int score;
 
@@ -33,7 +33,7 @@ public class Pool extends JPanel {
 
     int mouseX = 0;
     int mouseY = 0;
-    int ptX = 416;
+    int ptX = 405;
     int ptY = 400;
     double angle;
     public JButton leftButton;
@@ -48,17 +48,17 @@ public class Pool extends JPanel {
     public void getImg() throws IOException {
         getPoolImg();
         getFstImg();
-        getPtImg();
+        pt.getPtImg();
         getFishImg();
         getNetImg();
     }
 
-    private void getPtImg() throws IOException {
-        File file = new File("source/image/pt.png");
-//        sub=new JButton(new ImageIcon("source/image/sub.png"));
-//        add=new JButton(new ImageIcon("source/image/add.png"));
-        ptImg = ImageIO.read(file);
-    }
+//    private void getPtImg() throws IOException {
+//        File file = new File("source/image/pt/pt_1.png");
+////        sub=new JButton(new ImageIcon("source/image/sub.png"));
+////        add=new JButton(new ImageIcon("source/image/add.png"));
+//        ptImg = ImageIO.read(file);
+//    }
 
     private void getFstImg() throws IOException {
         File file = new File("source/image/fst.png");
@@ -115,9 +115,44 @@ public class Pool extends JPanel {
         leftButton.setBorderPainted(false);
 
         // 添加隐形按钮的点击事件
-        rightButton.addActionListener(e -> System.out.println("rightButton被点击"));//切换渔网
-
-        leftButton.addActionListener(e -> System.out.println("leftButton被点击"));//切换渔网
+        rightButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+//                net.level++;
+//                int level=net.level;
+//                if(level>5){
+//                    level=1;
+//                    net.level=1;
+//                }
+//                File file = new File("source/image/pt/pt_" + level+ ".png");
+//                try{
+//                    ptImg = ImageIO.read(file);
+//                }catch (IOException e1){
+//                    e1.printStackTrace();
+//                }
+                pt.addPt();
+            }
+        });
+        leftButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mouseClicked(e);
+//                net.level--;
+//                int level=net.level;
+//                if(level<1){
+//                    level=5;
+//                    net.level=5;
+//                }
+//                File file = new File("source/image/pt/pt_" + level+ ".png");
+//                try{
+//                    ptImg = ImageIO.read(file);
+//                }catch (IOException e1){
+//                    e1.printStackTrace();
+//                }
+                pt.subPt();
+            }
+        });
 
         // 将按钮添加到组件上
         this.add(rightButton);
@@ -168,8 +203,8 @@ public class Pool extends JPanel {
         double y1 = mouseY-ptY;
         angle = -Math.atan(x1/y1);
         Graphics2D gp = (Graphics2D) g;
-        gp.rotate(angle,ptX+ptImg.getWidth()/2,ptY+ptImg.getHeight());//这里补上sub和add图片 用Button
-        gp.drawImage(ptImg,ptX,ptY,null);
+        gp.rotate(angle,ptX+pt.ptImg.getWidth()/2,ptY+pt.ptImg.getHeight());
+        gp.drawImage(pt.ptImg,ptX,ptY,null);
     }
 
     private void drawNet(Graphics g) {
@@ -209,7 +244,14 @@ public class Pool extends JPanel {
 
                 Point netPoint = new Point(x, y);
 
-                catchFish(netPoint);
+//                catchFish(netPoint);
+                if (e.getButton() == MouseEvent.BUTTON1) {
+                    catchFish(netPoint);
+                } else if (e.getButton() == MouseEvent.BUTTON3) {
+//                    System.out.println("鼠标右键点击");
+                    pt.addPt();
+                    net.changeNet();
+                }
 
                 Bullet bullet = new Bullet(Pool.this);
                 bullet.imageIcon = new ImageIcon("source/image/bullet.png");
@@ -265,8 +307,8 @@ public class Pool extends JPanel {
             }
 
             private boolean checkCatchFish(Point netPoint, Point fishPoint) {
-                int juLi = (int) netPoint.distance(fishPoint);
-                if (juLi <= net.netImg.getWidth() / 2) {
+                int distance = (int) netPoint.distance(fishPoint);
+                if (distance <= net.netImg.getWidth() / 2) {
                     return true;
                 }
                 return false;
