@@ -26,7 +26,8 @@ public class Pool extends JPanel {
     public Net net = new Net();
     Pt pt=new Pt();
 
-    int score;
+    private int score = 0;
+    private int temp = 0;
 
     BufferedImage fstImg;
     BufferedImage ptImg;
@@ -39,8 +40,9 @@ public class Pool extends JPanel {
     double angle;
     public JButton leftButton;
     public JButton rightButton;
+    private Timer timer= new Timer();;//得分动画显示计时器
+    private boolean showImage = false;
     public int level=1;//炮台和渔网共用等级(暂时没有实现，在点击切换炮台的两个按钮的时候渔网大小不会变化)
-    Graphics tmp;
     ArrayList<Bullet> bullets = new ArrayList<Bullet>();
 
     public Pool(){
@@ -95,7 +97,6 @@ public class Pool extends JPanel {
 
     @Override
     public void paint(Graphics g) {
-        tmp=g;
         g.drawImage(poolImg, 0, 0, null);
         drawAllFish(g);
         drawNet(g);
@@ -150,23 +151,29 @@ public class Pool extends JPanel {
         g.drawImage(leftEduce, 343, 433, 80, 30, this);
         g.drawImage(rightAdd, 447, 433, 80, 30, this);
 
-//        MouseAdapter adapter = new MouseAdapter(){
-//            @Override
-//            public void mousePressed(MouseEvent e) {
-//                super.mousePressed(e);
-//                if (e.getButton() == MouseEvent.BUTTON1) {
-//                    System.out.println("鼠标左键被按下");
-//                    drawBullet(g);
-//                }
-//            }
-//
-//        };//这里非常奇怪，添加了一个鼠标监听器之后子弹就不出现了
-//        this.addMouseListener(adapter);
-//        this.addMouseMotionListener(adapter);
         drawBullet(g);
         drawMess(g);
         drawPt(g);
 
+        if (showImage) {
+            if(score-temp==10){
+                File file = new File("source/image/score/score_10.png");
+                try {
+                    BufferedImage img=ImageIO.read(file);
+                    g.drawImage(img,400,50,null);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }else{
+                File file = new File("source/image/score/score_20.png");
+                try {
+                    BufferedImage img=ImageIO.read(file);
+                    g.drawImage(img,400,50,null);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
     }
 
     private void drawBullet(Graphics g) {
@@ -197,6 +204,7 @@ public class Pool extends JPanel {
         g.drawString(String.valueOf(score%1000000/100000),31,464);
 
         g.drawString("子弹数量"+bullets.size(),30,30);
+
     }
 
     private void drawPt(Graphics g) {
@@ -242,10 +250,8 @@ public class Pool extends JPanel {
             public void mousePressed(MouseEvent e) {
                 int x = e.getX();
                 int y = e.getY();
-
+                finY=y;
                 Point netPoint = new Point(x, y);
-
-//                catchFish(netPoint);
 
                 Bullet bullet = new Bullet(Pool.this);
                 bullet.imageIcon = new ImageIcon("source/image/bullet.png");
@@ -288,23 +294,11 @@ public class Pool extends JPanel {
                     public void run() {
                         fish.removing();
                         if (fish.fishImg.getWidth() < 200) {//捕捉鱼的得分
-//                            File file = new File("source/image/score/score_10.png");
-//                            try {
-//                                BufferedImage img=ImageIO.read(file);
-//                                tmp.drawImage(img,400,50,null);
-//                            } catch (IOException e) {
-//                                throw new RuntimeException(e);
-//                            }
-                            score += 10;
+                            updateScore(10);
+                            recordTime();
                         } else {
-//                            File file = new File("source/image/score/score_20.png");
-//                            try {
-//                                BufferedImage img=ImageIO.read(file);
-//                                tmp.drawImage(img,400,50,null);
-//                            } catch (IOException e) {
-//                                throw new RuntimeException(e);
-//                            }
-                            score += 20;
+                            updateScore(20);
+                            recordTime();
                         }
                         if(score>1000){
                             File file = new File("source/image/t1.jpg");//根据分数切换背景(这里可以补充下一关提示)
@@ -359,4 +353,22 @@ public class Pool extends JPanel {
         }
     }
 
+    private void updateScore(int increment) {
+        // 更新score的值
+        score += increment;
+    }
+    public void recordTime() {
+        if (score != temp) {
+            showImage = true;
+            repaint();
+            temp = score;
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    showImage = false;
+                    repaint();
+                }
+            }, 500); // 0.5秒后执行任务
+        }
+    }
 }
