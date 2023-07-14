@@ -33,4 +33,17 @@ public class Net {
             e.printStackTrace();
         }
     }
+
+    public void repaintNet(){
+        level--;
+        if(level<1){
+            level=5;
+        }
+        File file = new File("source/image/net/net_" + level + ".png");
+        try{
+            netImg = ImageIO.read(file);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    }
 }

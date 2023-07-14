@@ -128,6 +128,7 @@ public class Pool extends JPanel {
 //                }
 //                net.level=level;
                 pt.addPt();
+                net.changeNet();
             }
         });
         leftButton.addMouseListener(new MouseAdapter() {
@@ -140,6 +141,7 @@ public class Pool extends JPanel {
 //                }
 //                net.level=level;
                 pt.subPt();
+                net.repaintNet();
             }
         });
 
@@ -156,22 +158,12 @@ public class Pool extends JPanel {
         drawPt(g);
 
         if (showImage) {
-            if(score-temp==10){
-                File file = new File("source/image/score/score_10.png");
-                try {
-                    BufferedImage img=ImageIO.read(file);
-                    g.drawImage(img,400,50,null);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }else{
-                File file = new File("source/image/score/score_20.png");
-                try {
-                    BufferedImage img=ImageIO.read(file);
-                    g.drawImage(img,400,50,null);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            File file = new File("source/image/score/score.png");
+            try {
+                BufferedImage img=ImageIO.read(file);
+                g.drawImage(img,400,50,null);//这里改变x和y会改变图片的位置（图片会跟随鼠标旋转旋转，很神奇）但是具体效果没有试出来一个好的
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }
     }
